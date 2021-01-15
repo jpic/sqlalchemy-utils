@@ -462,7 +462,10 @@ def database_exists(url):
         database, url.database = url.database, None
     except AttributeError:  #SQLalchemy 1.4: url is immutable
         database = url.database
-        url.set(database=None)
+        if url.drivername.startswith('postgres'):
+            url = url.set(database='postgres')
+        else:
+            url = url.set(database=None)
     engine = sa.create_engine(url)
 
     if engine.dialect.name == 'postgresql':
@@ -527,7 +530,10 @@ def create_database(url, encoding='utf8', template=None):
     database = url.database
 
     if url.drivername.startswith('postgres'):
-        url.database = 'postgres'
+        try:
+            url.database = 'postgres'
+        except AttributeError:
+            url = url.set(database='postgres')
     elif url.drivername.startswith('mssql'):
         url.database = 'master'
     elif not url.drivername.startswith('sqlite'):
