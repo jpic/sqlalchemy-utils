@@ -370,7 +370,7 @@ def get_primary_keys(mixed):
     """
     return OrderedDict(
         (
-            (key, column) for key, column in get_columns(mixed).items()
+            (key, column) for key, column in dict(get_columns(mixed)).items()
             if column.primary_key
         )
     )
